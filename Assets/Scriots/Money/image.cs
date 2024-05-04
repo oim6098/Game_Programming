@@ -46,7 +46,6 @@ public class image: MonoBehaviour
     // percentages 배열
      string percentageString = percentages[currentIndex].Replace("강화확률 :", "").Replace("%", "").Trim();
 
-    // 문자열을 정수로 변환을 시도합니다.
     int successChance;
     bool parseResult = int.TryParse(percentageString, out successChance);
     if (!parseResult)
@@ -62,7 +61,6 @@ public class image: MonoBehaviour
 
     return randomChance <= successChance;
 }
-    // 이미지와 텍스트를 현재 인덱스에 맞게 업데이트하는 메소드
     private void UpdateImageAndText()
     {
         if (images.Length > 0 && currentIndex < images.Length)
