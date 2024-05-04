@@ -1,23 +1,44 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-   public TextMeshProUGUI GoldText; // Main_Canvas // Main_Canvas -> MoneyT 값 
-    public int Gold = 1000000; // 초기 자금 
-    void Start()
+    public TextMeshProUGUI Gold;
+    public static GameManager instance; 
+    public int currentGold = 1000000; // 초기 자금 1백만원
+
+    void Awake()
     {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject); 
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
         UpdateGoldUI();
     }
 
-    public void UpdateGoldUI()
+    // 자금 차감 메소드
+    public bool DeductGold(int amount)
     {
-        GoldText.text = "Gold : " + Gold;
+        if (currentGold >= amount)
+        {
+            currentGold -= amount;
+            UpdateGoldUI(); // UI 업데이트
+            return true; // 성공적으로 차감
+        }
+        else
+        {
+            return false; // 자금이 부족함
+        }
     }
-    
 
-
+    // Gold Text UI 업데이트 메소드
+    private void UpdateGoldUI()
+    {
+        Gold.text = "Gold : " + currentGold;
+    }
 }

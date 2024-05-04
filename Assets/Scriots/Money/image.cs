@@ -6,15 +6,21 @@ using TMPro;
 
 public class image: MonoBehaviour
 {
-    public GameManager gameManager;
+    // 돈 함수
+    public int[] UpgradeGold; // 업그레이드 비용 
+    public int[] Sell;
+    public TextMeshProUGUI UpgradeGoldText;
+    
+    public TextMeshProUGUI SellText;
+
+    // 게임 이미지 
     public TextMeshProUGUI nameText; // 이름을 표시할 TextMeshProUGUI
     public TextMeshProUGUI percentageText; // 백분율을 표시할 TextMeshProUGUI
     public Sprite[] images; // 장갑 이미지 배열 
     public string[] names; // 장갑 이름 배열
     public string[] percentages; // 확률 배열 
-
-    public int[] UpgradeGold; // 업그레이드 비용 배열
-    public int[] SellGold; // 판매가격 비용 배열
+    
+    //
 
     private int currentIndex = 0; // 현재 이미지의 인덱스 위치
     private Image imageComponent; 
@@ -27,18 +33,36 @@ public class image: MonoBehaviour
 
     // 이미지, 이름, 백분율을 변경하는 메소드
     public void ChangeToNextImage()
+{
+    if (TryEnhanceSuccess()) // 강화 시도가 성공했을 경우
     {
-        if (TryEnhanceSuccess()) // 강화 시도
+        // 현재 인덱스에 해당하는 업그레이드 비용 가져오기
+        int upgradeCost = UpgradeGold[currentIndex];
+
+        // GameManager의 인스턴스를 사용하여 돈 차감 시도
+        bool isDeducted = GameManager.instance.DeductGold(upgradeCost);
+
+        if (isDeducted) // 돈 차감에 성공했다면
         {
-            currentIndex = (currentIndex + 1) % images.Length; // 성공하면 다음 인덱스로 이동
+            // 다음 인덱스로 이동
+            currentIndex = (currentIndex + 1) % images.Length;
+            Debug.Log("강화 성공 및 금액 차감");
         }
-        else
+        else // 돈이 부족하다면
         {
-            currentIndex = 0; // 실패하면 처음으로 돌아감
-            Debug.Log("강화실패");
+            Debug.Log("돈이 부족합니다.");
+            // 추가적인 처리를 할 수 있습니다. 예를 들어, 사용자에게 돈이 부족하다는 메시지를 보여줄 수 있습니다.
         }
-        UpdateImageAndText(); // 이미지와 텍스트 업데이트
     }
+    else
+    {
+        // 강화 실패
+        currentIndex = 0; // 실패하면 처음으로 돌아감
+        Debug.Log("강화실패");
+    }
+    UpdateImageAndText(); // 이미지와 텍스트 업데이트
+}
+
 
     // 강화 성공 여부를 결정하는 메소드
   private bool TryEnhanceSuccess()
@@ -65,6 +89,8 @@ public class image: MonoBehaviour
     {
         if (images.Length > 0 && currentIndex < images.Length)
         {
+            SellText.text = "판매비용 : " + Sell[currentIndex];
+            UpgradeGoldText.text = "강화비용 : " + UpgradeGold[currentIndex];
             imageComponent.sprite = images[currentIndex]; // 이미지 변경
             nameText.text = names[currentIndex]; // 이름 변경
             percentageText.text = percentages[currentIndex]; // 백분율 변경
